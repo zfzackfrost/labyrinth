@@ -1,4 +1,4 @@
-pub mod core;
+mod direction;
 mod maze;
 mod growing_tree;
 

@@ -1,4 +1,4 @@
-use crate::core::{E, S};
+use crate::direction::{E, S};
 use std::fmt;
 use std::iter;
 

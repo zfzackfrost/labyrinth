@@ -1,4 +1,4 @@
-use crate::core::*;
+use crate::direction::*;
 use crate::maze::Maze;
 use rand::distributions::Uniform;
 use rand::prelude::*;
