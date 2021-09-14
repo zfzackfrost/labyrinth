@@ -1,0 +1,21 @@
+[package]
+name = "labyrinth"
+version = "0.1.0"
+edition = "2018"
+authors = ["Zachary Frost <zfzackfrost@pm.me>"]
+description = "Maze generation algorithms for Rust"
+homepage = "https://github.com/zfzackfrost/labyrinth"
+repository = "https://github.com/zfzackfrost/labyrinth"
+license = "MIT"
+readme = "README.md"
+keywords = ["maze", "generate", "game", "algorithms", "2d"]
+categories = ["algorithms", "game-development"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.8.4"
+
+[dev-dependencies]
+rand_chacha = "0.3.1"
+argh = "0.1.6"
