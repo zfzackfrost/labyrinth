@@ -4,7 +4,6 @@ use crate::maze::Maze;
 
 use rand::distributions::Uniform;
 use rand::prelude::*;
-use rand::seq::index;
 
 #[derive(Debug, Copy, Clone)]
 pub enum IndexMode {
