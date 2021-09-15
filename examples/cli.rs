@@ -31,7 +31,7 @@ enum CliSubcommands {
 }
 
 #[derive(FromArgs, PartialEq, Debug)]
-#[argh(subcommand, name="growingtree")]
+#[argh(subcommand, name = "growingtree")]
 /// Growing Tree algorithm
 struct CliGrowingTreeCommand {
     #[argh(option)]
@@ -54,21 +54,24 @@ fn main() {
     let maze = match cli.cmd {
         CliSubcommands::CmdGrowingTree(cmd) => {
             let index_commands = {
-                let mut v = Vec::new();
-                cmd.commands.split(';').for_each(|command_str| {
-                    let mut weights = Vec::new();
-                    command_str.split(',').for_each(|pair_str| {
-                        let (weight_str, mode_str) = pair_str.split_once(':').unwrap();
-                        let mode = IndexMode::from_lower_str(mode_str).unwrap();
-                        let weight = weight_str.parse::<f64>().unwrap();
-                        weights.push((weight, mode));
-                    });
-                    v.push(IndexCommand::new(weights));
-                });
-                v
+                cmd.commands
+                    .split(';')
+                    .map(|command_str| {
+                        let weights: Vec<_> = command_str
+                            .split(',')
+                            .map(|pair_str| {
+                                let (weight_str, mode_str) = pair_str.split_once(':').unwrap();
+                                let mode = IndexMode::from_lower_str(mode_str).unwrap();
+                                let weight = weight_str.parse::<f64>().unwrap();
+                                (weight, mode)
+                            })
+                            .collect();
+                        IndexCommand::new(weights)
+                    })
+                    .collect()
             };
             GrowingTree::new(index_commands).generate_maze(cli.width, cli.height, &mut rng)
-        },
+        }
     };
     println!("{}", maze);
 }
