@@ -3,7 +3,7 @@ use argh::FromArgs;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 
-use labyrinth::growing_tree;
+use labyrinth::*;
 
 #[derive(FromArgs)]
 /// Generate random mazes
@@ -29,6 +29,6 @@ fn main() {
         ChaChaRng::from_entropy()
     };
 
-    let maze = growing_tree(cli.width, cli.height, &mut rng);
+    let maze = GrowingTree::default().generate_maze(cli.width, cli.height, &mut rng);
     println!("{}", maze);
 }

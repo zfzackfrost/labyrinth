@@ -1,10 +1,12 @@
+use crate::base::MazeGenerator;
 use crate::direction::*;
 use crate::maze::Maze;
+
 use rand::distributions::Uniform;
 use rand::prelude::*;
 
 #[derive(Debug, Copy, Clone)]
-enum IndexMode {
+pub enum IndexMode {
     Random,
     Newest,
     Middle,
@@ -23,7 +25,7 @@ impl IndexMode {
 }
 
 #[derive(Clone)]
-struct IndexCommand {
+pub struct IndexCommand {
     weights: Vec<(f64, IndexMode)>,
     distribution: Uniform<f64>,
 }
@@ -53,13 +55,13 @@ impl IndexCommand {
     }
 }
 
-struct GrowingTree {
+pub struct GrowingTree {
     index_commands: Vec<IndexCommand>,
     current_index_cmd: usize,
 }
 
-impl GrowingTree {
-    fn new() -> Self {
+impl Default for GrowingTree {
+    fn default() -> Self {
         Self {
             index_commands: {
                 use IndexMode::*;
@@ -71,6 +73,15 @@ impl GrowingTree {
             current_index_cmd: 0,
         }
     }
+}
+
+impl GrowingTree {
+    pub fn new(index_commands: Vec<IndexCommand>) -> Self {
+        Self {
+            index_commands,
+            ..Default::default()
+        }
+    }
 
     fn next_index<R: Rng + RngCore>(&mut self, ceil: usize, rng: &mut R) -> usize {
         let command = &self.index_commands[self.current_index_cmd];
@@ -79,46 +90,52 @@ impl GrowingTree {
     }
 }
 
-pub fn growing_tree<R: Rng + RngCore>(width: u64, height: u64, rng: &mut R) -> Maze {
-    let mut algo = GrowingTree::new();
-    let mut maze = Maze::new(width, height);
-    let mut cells = Vec::new();
+impl MazeGenerator for GrowingTree {
+    fn generate_maze<RandGen: Rng + RngCore>(
+        &mut self,
+        width: u64,
+        height: u64,
+        rng: &mut RandGen,
+    ) -> Maze {
+        let mut maze = Maze::new(width, height);
+        let mut cells = Vec::new();
 
-    {
-        let x = rng.gen_range(0..width);
-        let y = rng.gen_range(0..height);
-        cells.push((x, y));
-    }
+        {
+            let x = rng.gen_range(0..width);
+            let y = rng.gen_range(0..height);
+            cells.push((x, y));
+        }
 
-    while !cells.is_empty() {
-        let index = algo.next_index(cells.len(), rng);
-        let (x, y) = cells[index];
-        let mut index = Some(index);
-        let dirs = {
-            let mut v = vec![N, S, E, W];
-            v.shuffle(rng);
-            v
-        };
-        for dir in dirs {
-            let nx = x as i64 + get_dx(dir);
-            let ny = y as i64 + get_dy(dir);
-            if nx >= 0
-                && ny >= 0
-                && nx < width as i64
-                && ny < height as i64
-                && maze.grid[ny as usize][nx as usize] == 0
-            {
-                maze.grid[y as usize][x as usize] |= dir;
-                maze.grid[ny as usize][nx as usize] |= get_opposite(dir);
-                cells.push((nx as u64, ny as u64));
-                index = None;
-                break;
+        while !cells.is_empty() {
+            let index = self.next_index(cells.len(), rng);
+            let (x, y) = cells[index];
+            let mut index = Some(index);
+            let dirs = {
+                let mut v = vec![N, S, E, W];
+                v.shuffle(rng);
+                v
+            };
+            for dir in dirs {
+                let nx = x as i64 + get_dx(dir);
+                let ny = y as i64 + get_dy(dir);
+                if nx >= 0
+                    && ny >= 0
+                    && nx < width as i64
+                    && ny < height as i64
+                    && maze.grid[ny as usize][nx as usize] == 0
+                {
+                    maze.grid[y as usize][x as usize] |= dir;
+                    maze.grid[ny as usize][nx as usize] |= get_opposite(dir);
+                    cells.push((nx as u64, ny as u64));
+                    index = None;
+                    break;
+                }
+            }
+            if let Some(index) = index {
+                cells.remove(index);
             }
         }
-        if let Some(index) = index {
-            cells.remove(index);
-        }
-    }
 
-    maze
+        maze
+    }
 }

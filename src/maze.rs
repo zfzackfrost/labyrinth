@@ -1,6 +1,7 @@
 use crate::direction::{E, S};
 use std::fmt;
 use std::iter;
+use std::iter::FromIterator;
 
 pub struct Maze {
     pub grid: Vec<Vec<u8>>,
@@ -15,6 +16,7 @@ impl Maze {
             size: (width, height),
         }
     }
+
     fn sz(&self) -> (usize, usize) {
         (self.size.0 as usize, self.size.1 as usize)
     }
@@ -24,11 +26,8 @@ impl fmt::Display for Maze {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let sz = self.sz();
 
-        write!(f, " ")?;
-        for s in iter::repeat("_").take(sz.0 * 2 - 1) {
-            write!(f, "{}", s)?;
-        }
-        writeln!(f)?;
+        let s = String::from_iter(iter::repeat('_').take(sz.0 * 2 + 1));
+        writeln!(f, "{}", s)?;
 
         for (y, row) in self.grid.iter().enumerate() {
             write!(f, "|")?;

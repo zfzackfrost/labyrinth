@@ -1,7 +1,8 @@
+mod base;
 mod direction;
-mod maze;
 mod growing_tree;
+mod maze;
 
-
+pub use base::MazeGenerator;
+pub use growing_tree::{GrowingTree, IndexCommand, IndexMode};
 pub use maze::Maze;
-pub use growing_tree::growing_tree;
