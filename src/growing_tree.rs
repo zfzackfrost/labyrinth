@@ -22,6 +22,15 @@ impl IndexMode {
             IndexMode::Oldest => 0,
         }
     }
+    pub fn from_lower_str(s: &str) -> Option<Self> {
+        match s {
+            "random" => Some(Self::Random),
+            "newest" => Some(Self::Newest),
+            "oldest" => Some(Self::Oldest),
+            "middle" => Some(Self::Middle),
+            _ => None
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -31,7 +40,7 @@ pub struct IndexCommand {
 }
 
 impl IndexCommand {
-    fn new(weights: Vec<(f64, IndexMode)>) -> Self {
+    pub fn new(weights: Vec<(f64, IndexMode)>) -> Self {
         let mut total_weight = 0.0;
         for (weight, _mode) in &weights {
             total_weight += *weight;
